@@ -1,35 +1,41 @@
 
-#include "list.h"
+#include "seq.h"
 
-
-list_t* make_list()
+list_t *make_list()
 {
-    list_t* list = (list_t*) malloc(sizeof(list_t));
+    list_t *list = (list_t *)malloc(sizeof(list_t));
     list->length = 0;
     list->data = NULL;
     return list;
 }
-int destory_list(list_t* list)
+int destory_list(list_t *list)
 {
-    if (list->data != NULL) {
-        cell_t* cell = list->data;
-        if (cell->next == list->data) { free(cell->data); free(cell); }
-        while (cell->next != list->data)
+    if (list->data != NULL)
+    {
+        cell_t *cell = list->data;
+        if (cell->next == list->data)
         {
             free(cell->data);
-            if (cell->prev != NULL)
-            {
-                free(cell->prev);
-            }
-            cell = cell->next;
+            free(cell);
         }
+        else
+            while (cell->next != list->data)
+            {
+                free(cell->data);
+                if (cell->prev != NULL)
+                {
+                    free(cell->prev);
+                }
+                cell = cell->next;
+            }
+        free(list);
     }
     return 0;
 }
 
-size_t insert_elem(list_t* list, void* element, size_t index)
+size_t insert_elem(list_t *list, void *element, size_t index)
 {
-    cell_t* cell = (cell_t*)malloc(sizeof(cell_t));
+    cell_t *cell = (cell_t *)malloc(sizeof(cell_t));
     cell->data = element;
 
     if (list->data == NULL)
@@ -40,31 +46,31 @@ size_t insert_elem(list_t* list, void* element, size_t index)
         list->length++;
         return index;
     }
-    
-    cell_t* point = list->data;
-    
+
+    cell_t *point = list->data;
+
     while (point->next != list->data && index)
     {
         point = point->next;
         index--;
     }
-    
+
     cell->next = point->next;
     cell->next->prev = cell;
     cell->prev = point;
     point->next = cell;
     list->length++;
-    
+
     return index;
 }
-int remove_elem(list_t* list, void* element)
+int remove_elem(list_t *list, void *element)
 {
-    cell_t* point = list->data;
+    cell_t *point = list->data;
     if (point == NULL)
     {
         return -1;
     }
-    
+
     if (list->length == 1)
     {
         if (element == point->data)
@@ -77,7 +83,7 @@ int remove_elem(list_t* list, void* element)
         }
         return -1;
     }
-    
+
     while (point != list->data)
     {
         if (point->data == element)
@@ -91,11 +97,11 @@ int remove_elem(list_t* list, void* element)
         }
         point = point->next;
     }
-    
+
     return -1;
 }
 
-void* get_elem(list_t* list, int offset)
+void *get_elem(list_t *list, int offset)
 {
     if (list->data == NULL)
     {
@@ -105,7 +111,7 @@ void* get_elem(list_t* list, int offset)
     {
         return NULL;
     }
-    cell_t* cell = list->data;
+    cell_t *cell = list->data;
     while (offset--)
     {
         cell = cell->next;
@@ -113,11 +119,12 @@ void* get_elem(list_t* list, int offset)
     return cell->data;
 }
 
-size_t find_elem(list_t* list, void* element)
+size_t find_elem(list_t *list, void *element)
 {
-    cell_t* cell = list->data;
-    
-    if (!cell || (cell->next == list->data && cell->data != element) || list->length == 0 ) return list->length;
+    cell_t *cell = list->data;
+
+    if (!cell || (cell->next == list->data && cell->data != element) || list->length == 0)
+        return list->length;
     int i = 0;
     while (cell != list->data)
     {
@@ -127,21 +134,21 @@ size_t find_elem(list_t* list, void* element)
         cell = cell->next;
     }
     return i;
-    
 }
 
-size_t append_elem(list_t* list, void* element)
+size_t append_elem(list_t *list, void *element)
 {
-    if (list->data == NULL || list->length == 0) return insert_elem(list, element, 0);
-    cell_t* point = list->data->prev;
-    
-    cell_t* cell = malloc(sizeof(cell_t));
+    if (list->data == NULL || list->length == 0)
+        return insert_elem(list, element, 0);
+    cell_t *point = list->data->prev;
+
+    cell_t *cell = malloc(sizeof(cell_t));
     cell->data = element;
     cell->next = point->next;
     cell->prev = point;
     cell->next->prev = cell;
     point->next = cell;
     list->length++;
-    
+
     return list->length;
 }
